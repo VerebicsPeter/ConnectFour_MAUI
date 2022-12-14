@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ConnectFour_MAUI.View.GamePage"
+             Title="Connect Four">
+
+    <Grid Margin="4" RowSpacing="8">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- a gombokat a képernyő tetejére helyezzük -->
+        <Button Text="New Game" Command="{Binding NewGameCommand}" IsEnabled="{Binding HasMoves}" Grid.Row="0" HorizontalOptions="Start">
+            <Button.Triggers>
+                <DataTrigger TargetType="Button" Binding="{Binding HasMoves}" Value="False">
+                    <Setter Property="BackgroundColor" Value="DimGray"/>
+                    <Setter Property="TextColor" Value="White"/>
+                </DataTrigger>
+                <DataTrigger TargetType="Button" Binding="{Binding HasMoves}" Value="True">
+                    <Setter Property="BackgroundColor" Value="White"/>
+                    <Setter Property="TextColor" Value="Black"/>
+                </DataTrigger>
+            </Button.Triggers>
+        </Button>
+
+        <Button Command="{Binding PauseGameCommand}" Grid.Row="0" HorizontalOptions="Center">
+            <Button.Triggers>
+                <DataTrigger TargetType="Button" Binding="{Binding AppTimerEnabled}" Value="False">
+                    <Setter Property="Text"  Value="Resume"/>
+                </DataTrigger>
+                <DataTrigger TargetType="Button" Binding="{Binding AppTimerEnabled}" Value="True">
+                    <Setter Property="Text"  Value="Pause"/>
+                </DataTrigger>
+            </Button.Triggers>
+        </Button>
+
+        <Button Text="Settings" Command="{Binding ExitGameCommand}" Grid.Row="0" HorizontalOptions="End"/>
+
+        <ScrollView Grid.Row="1" Orientation="Both" BackgroundColor="Black">
+
+            <Grid
+                    IsVisible="{Binding AppTimerEnabled}"
+                    BindableLayout.ItemsSource="{Binding Fields}"
+                    ColumnSpacing="5" RowSpacing="5"
+                    RowDefinitions="{Binding GameTableRows}" ColumnDefinitions="{Binding GameTableColumns}"
+                    MaximumWidthRequest ="{Binding GetTableSize}" MinimumWidthRequest ="{Binding GetTableSize}"
+                    MaximumHeightRequest="{Binding GetTableSize}" MinimumHeightRequest="{Binding GetTableSize}"
+                >
+
+                <!-- a játéktáblát egy sorfolytos listával valósítjuk meg -->
+                <BindableLayout.ItemTemplate>
+
+                    <DataTemplate>
+                        <!-- a rács elemei gombok lesznek -->
+                        <Button
+                                Grid.Row="{Binding Row}" Grid.Column="{Binding Col}"
+                                Command="{Binding StepCommand}" CommandParameter="{Binding Number}"
+                                Text="{Binding Text}"
+                                Padding="0" CornerRadius="50"
+                                FontAttributes="Bold" FontSize="26"
+                                VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand"
+                                BorderColor="Black" BorderWidth="1"
+                            >
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" Binding="{Binding IsWinning}" Value="False">
+                                    <Setter Property="BackgroundColor" Value="White"/>
+                                </DataTrigger>
+                                <DataTrigger TargetType="Button" Binding="{Binding IsWinning}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="DimGray"/>
+                                    <Setter Property="TextColor"  Value="White"/>
+                                </DataTrigger>
+                                <DataTrigger TargetType="Button" Binding="{Binding Text}" Value="X">
+                                    <Setter Property="TextColor"  Value="Red"/>
+                                </DataTrigger>
+                                <DataTrigger TargetType="Button" Binding="{Binding Text}" Value="O">
+                                    <Setter Property="TextColor"  Value="Blue"/>
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+                    </DataTemplate>
+
+                </BindableLayout.ItemTemplate>
+            </Grid>
+
+        </ScrollView>
+
+        <!-- pause label -->
+        <Label Grid.Row="1" Text="Game Paused" FontSize="Large" HorizontalOptions="Center" Padding="10">
+            <Label.Triggers>
+                <DataTrigger TargetType="Label" Binding="{Binding AppTimerEnabled}" Value="False">
+                    <Setter Property="IsVisible"  Value="True"/>
+                </DataTrigger>
+                <DataTrigger TargetType="Label" Binding="{Binding AppTimerEnabled}" Value="True">
+                    <Setter Property="IsVisible"  Value="False"/>
+                </DataTrigger>
+            </Label.Triggers>
+        </Label>
+
+        <!-- az információkat alul írjuk ki -->
+        <StackLayout Orientation="Horizontal" HorizontalOptions="Start" Grid.Row="2">
+            <Label Text="  Time::"/>
+            <Label Text="{Binding TurnTime}"/>
+            <Label Text=""/>
+            <Label Text="  X::"/>
+            <Label Text=""/>
+            <Label Text="{Binding XTime}"/>
+            <Label Text=""/>
+            <Label Text="  O::"/>
+            <Label Text="{Binding OTime}"/>
+        </StackLayout>
+        <StackLayout Orientation="Horizontal" HorizontalOptions="End" Grid.Row="2">
+            <Label Text="Player::"/>
+            <Label Text="{Binding PlayerString}"/>
+        </StackLayout>
+    </Grid>
+</ContentPage>
